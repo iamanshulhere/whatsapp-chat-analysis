@@ -38,6 +38,7 @@ def most_busy_users(df):
     x = temp['user'].value_counts().head()
     
     # Calculating percentage 
-    percentage_df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index().rename(columns = {'index' : 'name', 'user' : 'percent'})
+    percentage_df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index()
+    percentage_df.columns = ['name', 'percent']
     
     return x, percentage_df
