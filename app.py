@@ -65,4 +65,21 @@ if uploaded_file is not None:
             with col2:
                 st.dataframe(new_df)
                 
-            
+        
+        # WordCloud
+        st.title("WordCloud")
+        df_wc = helper.create_wordcloud(selected_user, df)
+        fig, axis = plt.subplots()
+        axis.imshow(df_wc)
+        st.pyplot(fig)
+        
+        # Most common words
+        
+        st.title("Most Common Words")
+        most_common_df = helper.most_common_words(selected_user, df)
+        
+        fig, axis = plt.subplots()
+        axis.barh(most_common_df[0], most_common_df[1])
+        plt.xticks(rotation = 'vertical')
+        st.pyplot(fig)
+        
