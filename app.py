@@ -7,15 +7,17 @@ import matplotlib.font_manager as fm
 plt.rcParams['font.family'] = ['Segoe UI Emoji']
 
 
-
-
 st.sidebar.title("What'sapp Chat Analyzer")
 
 uploaded_file = st.sidebar.file_uploader("Choose a file")
 if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     
+try:
     data = bytes_data.decode("utf-8")
+except:
+    data = bytes_data.decode("latin-1", errors="ignore")
+
     df = preprocessor.preprocess(data)
     
     st.dataframe(df)
