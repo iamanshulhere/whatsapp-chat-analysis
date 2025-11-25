@@ -5,27 +5,32 @@ import seaborn as sns
 
 plt.rcParams['font.family'] = ['Segoe UI Emoji']
 
-
 st.sidebar.title("WhatsApp Chat Analyzer")
 
-# FIX 1: Add unique key
+# File Upload
 uploaded_file = st.sidebar.file_uploader("Choose a file", key="chat_file")
 
-# ------------------ NO FILE UPLOADED ------------------
+# ------------------- NO FILE UPLOADED -------------------
 if uploaded_file is None:
     st.title("WhatsApp Chat Analyzer")
-    st.info("Please upload a WhatsApp chat text file to start the analysis.")
-    st.stop()   # STOP execution here (important!)
+    st.info("Please upload a WhatsApp chat (.txt or .pdf) to start the analysis.")
+    st.stop()
 
-# ------------------ FILE UPLOADED ------------------
+# ------------------- FILE UPLOADED -------------------
 bytes_data = uploaded_file.getvalue()
 
-try:
-    data = bytes_data.decode("utf-8")
-except:
-    data = bytes_data.decode("latin-1", errors="ignore")
+# Detect PDF or text
+if uploaded_file.name.endswith(".pdf"):
+    df = preprocessor.preprocess(uploaded_file, is_pdf=True)
+else:
+    try:
+        data = bytes_data.decode("utf-8")
+    except:
+        data = bytes_data.decode("latin-1", errors="ignore")
 
-df = preprocessor.preprocess(data)
+    df = preprocessor.preprocess(data)
+
+# Show data
 st.dataframe(df)
 
 # Fetch unique users
@@ -38,10 +43,13 @@ user_list.insert(0, "Overall")
 
 selected_user = st.sidebar.selectbox("Show analysis for", user_list)
 
-# ------------------ START ANALYSIS ------------------
+# ---------------------------------------------------------
+# ---------------------- ANALYSIS -------------------------
+# ---------------------------------------------------------
+
 if st.sidebar.button("Show Analysis"):
 
-    # Top Stats
+    # 🔹 Top Statistics
     num_messages, words, num_media, links = helper.fetch_stats(selected_user, df)
 
     st.title("Top Statistics")
@@ -63,7 +71,7 @@ if st.sidebar.button("Show Analysis"):
         st.header("Total Links")
         st.title(links)
 
-    # Monthly Timeline
+    # 🔹 Monthly Timeline
     st.title("Monthly Timeline")
     time_line = helper.monthly_timeline(selected_user, df)
     fig, ax = plt.subplots(figsize=(12, 4))
@@ -71,7 +79,7 @@ if st.sidebar.button("Show Analysis"):
     plt.xticks(rotation=90)
     st.pyplot(fig)
 
-    # Daily Timeline
+    # 🔹 Daily Timeline
     st.title("Daily Timeline")
     daily_timeline = helper.daily_timeline(selected_user, df)
     fig, ax = plt.subplots(figsize=(12, 4))
@@ -79,7 +87,7 @@ if st.sidebar.button("Show Analysis"):
     plt.xticks(rotation=90)
     st.pyplot(fig)
 
-    # Activity Map
+    # 🔹 Activity Map
     st.title("Activity Map")
     col1, col2 = st.columns(2)
 
@@ -99,9 +107,10 @@ if st.sidebar.button("Show Analysis"):
         plt.xticks(rotation=90)
         st.pyplot(fig)
 
-    # Weekly Activity Heatmap
+    # 🔹 Weekly Activity Heatmap
     st.title("Weekly Activity Map")
     heatmap_df = helper.activity_heatmap(selected_user, df)
+
     fig, ax = plt.subplots(figsize=(16, 6))
     sns.heatmap(
         heatmap_df,
@@ -114,7 +123,7 @@ if st.sidebar.button("Show Analysis"):
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-    # Busy Users
+    # 🔹 Busy Users (Only for Overall)
     if selected_user == "Overall":
         st.title("Busy Users")
         x, new_df = helper.most_busy_users(df)
@@ -129,7 +138,7 @@ if st.sidebar.button("Show Analysis"):
         with col2:
             st.dataframe(new_df)
 
-    # WordCloud
+    # 🔹 WordCloud
     st.title("WordCloud")
     df_wc = helper.create_wordcloud(selected_user, df)
     fig, ax = plt.subplots()
@@ -137,7 +146,7 @@ if st.sidebar.button("Show Analysis"):
     ax.axis("off")
     st.pyplot(fig)
 
-    # Most Common Words
+    # 🔹 Most Common Words
     st.title("Most Common Words")
     most_common_df = helper.most_common_words(selected_user, df)
     fig, ax = plt.subplots()
@@ -145,7 +154,7 @@ if st.sidebar.button("Show Analysis"):
     plt.xticks(rotation=90)
     st.pyplot(fig)
 
-    # Emoji Analysis
+    # 🔹 Emoji Analysis
     st.title("Emoji Analysis")
     emoji_df = helper.emoji_helper(selected_user, df)
 

@@ -8,3 +8,4 @@ wordcloud
 emoji
 nltk
 python-dateutil
+pdfplumber
