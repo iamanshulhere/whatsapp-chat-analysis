@@ -7,3 +7,4 @@ urlextract
 wordcloud
 emoji
 nltk
+python-dateutil
